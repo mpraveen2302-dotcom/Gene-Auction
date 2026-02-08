@@ -4,7 +4,7 @@ from db import load_state, save_state
 
 st.title("🔘 TEAM BUZZER")
 
-# ✅ SAFE AUTO REFRESH
+# 🔄 Auto refresh every second
 st.markdown("<meta http-equiv='refresh' content='1'>", unsafe_allow_html=True)
 
 team = st.text_input("Enter Team Name")
@@ -12,7 +12,7 @@ state = load_state()
 
 st.subheader(f"Round {state['round']}")
 
-# ---------- COUNTDOWN ----------
+# ---------- LIVE COUNTDOWN ----------
 if state["game_active"]:
     remaining = int(state["countdown"] - (time.time() - state["start_time"]))
     remaining = max(remaining, 0)
@@ -32,7 +32,7 @@ if st.button("🚨 BUZZ!", disabled=disabled):
     state["buzz_order"].append({"team": team, "time": buzz_time})
     save_state(state)
 
-# 🔔 AUCTION BUZZ SOUND
+# 🔔 Auction buzzer sound
 if len(state["buzz_order"]) > 0:
     st.audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3", autoplay=True)
 
