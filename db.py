@@ -7,7 +7,8 @@ default_state = {
     "game_active": False,
     "start_time": None,
     "countdown": 10,
-    "buzz_order": []   # ⭐ NEW
+    "buzz_order": [],
+    "leaderboard": {}
 }
 
 def load_state():
