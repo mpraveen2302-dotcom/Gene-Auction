@@ -5,11 +5,10 @@ from db import load_state, save_state
 st.set_page_config(layout="wide")
 st.title("🎤 QUIZ MASTER DASHBOARD")
 
-state = load_state()
+# ✅ SAFE AUTO REFRESH EVERY 1 SECOND
+st.markdown("<meta http-equiv='refresh' content='1'>", unsafe_allow_html=True)
 
-# ---------- AUTO REFRESH ----------
-time.sleep(1)
-st.rerun()
+state = load_state()
 
 # ---------- SCORING FUNCTION ----------
 def update_scores():
@@ -31,7 +30,6 @@ if st.button("💾 Update Timer"):
 
 col1, col2, col3 = st.columns(3)
 
-# START ROUND
 with col1:
     if st.button("▶ START ROUND"):
         state["game_active"] = True
@@ -39,7 +37,6 @@ with col1:
         state["buzz_order"] = []
         save_state(state)
 
-# NEXT ROUND
 with col2:
     if st.button("⏭ NEXT ROUND"):
         update_scores()
@@ -48,7 +45,6 @@ with col2:
         state["buzz_order"] = []
         save_state(state)
 
-# RESET GAME
 with col3:
     if st.button("🔁 RESET GAME"):
         state = {
@@ -61,7 +57,7 @@ with col3:
         }
         save_state(state)
 
-# ---------- LIVE ROUND STATUS ----------
+# ---------- LIVE ROUND ----------
 st.header(f"🔴 Round {state['round']}")
 
 if state["game_active"]:
