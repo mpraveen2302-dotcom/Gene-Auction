@@ -5,7 +5,15 @@ from db import load_state, save_state
 st.set_page_config(layout="wide")
 st.title("🎤 QUIZ MASTER DASHBOARD")
 
-# ✅ SAFE AUTO REFRESH EVERY 1 SECOND
+# 🔐 HOST PASSWORD (change this!!)
+HOST_PASSWORD = "quizmaster123"
+
+password = st.text_input("Enter Host Password", type="password")
+if password != HOST_PASSWORD:
+    st.warning("This page is only for Quiz Master")
+    st.stop()
+
+# 🔄 Auto refresh every second
 st.markdown("<meta http-equiv='refresh' content='1'>", unsafe_allow_html=True)
 
 state = load_state()
@@ -22,7 +30,7 @@ def update_scores():
 # ---------- ROUND CONTROLS ----------
 st.header("⚙️ Round Controls")
 
-new_time = st.number_input("Countdown seconds", 3, 60, state["countdown"])
+new_time = st.number_input("Set Countdown (seconds)", 3, 60, state["countdown"])
 
 if st.button("💾 Update Timer"):
     state["countdown"] = new_time
@@ -57,7 +65,7 @@ with col3:
         }
         save_state(state)
 
-# ---------- LIVE ROUND ----------
+# ---------- LIVE ROUND STATUS ----------
 st.header(f"🔴 Round {state['round']}")
 
 if state["game_active"]:
