@@ -7,19 +7,19 @@ st.title("🔘 TEAM BUZZER")
 team = st.text_input("Enter Team Name")
 state = load_state()
 
-# 🔄 AUTO REFRESH
+# ---------- AUTO REFRESH ----------
 time.sleep(1)
-st.experimental_rerun()
+st.rerun()
 
 st.subheader(f"Round {state['round']}")
 
-# COUNTDOWN DISPLAY
+# ---------- LIVE COUNTDOWN ----------
 if state["game_active"]:
     remaining = int(state["countdown"] - (time.time() - state["start_time"]))
     remaining = max(remaining, 0)
     st.metric("⏳ Time Left", remaining)
 
-# BUZZ BUTTON LOGIC
+# ---------- BUZZ BUTTON ----------
 already_buzzed = [b["team"] for b in state["buzz_order"]]
 
 disabled = (
@@ -37,14 +37,14 @@ if st.button("🚨 BUZZ!", disabled=disabled):
     })
     save_state(state)
 
-# AUCTION BUZZ SOUND
+# ---------- AUCTION BUZZER SOUND ----------
 if len(state["buzz_order"]) > 0:
     st.audio(
         "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
         autoplay=True
     )
 
-# SHOW POSITION
+# ---------- SHOW POSITION ----------
 for i, buzz in enumerate(state["buzz_order"], start=1):
     if buzz["team"] == team:
         st.success(f"You buzzed #{i}!")
