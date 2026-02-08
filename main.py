@@ -1,47 +1,55 @@
 import streamlit as st
 import time
+from db import load_state, save_state
 
-st.set_page_config(page_title="Host Panel", layout="centered")
+st.set_page_config(layout="wide")
+st.title("🎤 QUIZ MASTER DASHBOARD")
 
-COUNTDOWN = 10
+state = load_state()
 
-if "game_active" not in st.session_state:
-    st.session_state.game_active = False
-    st.session_state.start_time = None
-    st.session_state.winner = None
-    st.session_state.click_time = None
+# 🔄 AUTO REFRESH EVERY SECOND
+time.sleep(1)
+st.experimental_rerun()
 
-st.title("🎤 Quiz Host Panel")
+# -------- ROUND SETTINGS --------
+st.header("⚙️ Round Controls")
+new_time = st.number_input("Countdown seconds", 3, 60, state["countdown"])
 
-# Start buzzer
-if st.button("▶ Start Buzzer"):
-    st.session_state.game_active = True
-    st.session_state.start_time = time.time()
-    st.session_state.winner = None
-    st.session_state.click_time = None
+if st.button("💾 Update Timer"):
+    state["countdown"] = new_time
+    save_state(state)
 
-# Reset
-if st.button("🔁 Reset"):
-    st.session_state.game_active = False
-    st.session_state.start_time = None
-    st.session_state.winner = None
-    st.session_state.click_time = None
+col1, col2 = st.columns(2)
 
-# Countdown
-if st.session_state.game_active:
-    elapsed = int(time.time() - st.session_state.start_time)
-    remaining = max(COUNTDOWN - elapsed, 0)
-    st.subheader(f"⏳ Time Left: {remaining}s")
+# START ROUND
+with col1:
+    if st.button("▶ START ROUND"):
+        state["game_active"] = True
+        state["start_time"] = time.time()
+        state["buzz_order"] = []
+        save_state(state)
 
-    if remaining == 0 and st.session_state.winner is None:
-        st.warning("⏰ No team buzzed!")
-        st.session_state.game_active = False
+# NEXT ROUND
+with col2:
+    if st.button("⏭ NEXT ROUND"):
+        state["round"] += 1
+        state["game_active"] = False
+        state["buzz_order"] = []
+        save_state(state)
 
-# Winner display
-if st.session_state.winner:
-    st.success(f"🏆 {st.session_state.winner} won!")
-    st.info(f"⏱ Response time: {st.session_state.click_time}s")
-    st.audio(
-        "https://www.soundjay.com/buttons/sounds/button-3.mp3",
-        autoplay=True
-    )
+# -------- LIVE COUNTDOWN --------
+st.header(f"🔴 Round {state['round']}")
+
+if state["game_active"]:
+    remaining = int(state["countdown"] - (time.time() - state["start_time"]))
+    remaining = max(remaining, 0)
+    st.metric("⏳ Countdown", remaining)
+
+# -------- LEADERBOARD --------
+st.header("🥇 Buzz Leaderboard")
+
+if len(state["buzz_order"]) == 0:
+    st.info("No buzzes yet")
+
+for i, buzz in enumerate(state["buzz_order"], start=1):
+    st.write(f"{i}. {buzz['team']} — {buzz['time']} sec")
