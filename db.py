@@ -12,16 +12,14 @@ default_state = {
 }
 
 def load_state():
-    # If DB doesn't exist → create new
     if not os.path.exists(DB_FILE):
         save_state(default_state)
         return default_state
 
-    # Load existing DB
     with open(DB_FILE, "r") as f:
         state = json.load(f)
 
-    # ⭐ AUTO-FIX missing keys (important)
+    # Auto add missing keys (prevents crashes forever)
     for key, value in default_state.items():
         if key not in state:
             state[key] = value
